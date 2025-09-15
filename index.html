@@ -10,44 +10,49 @@ body { font-family: Arial, sans-serif; background:#f5f5f5; overflow-x:hidden; tr
 
 /* Header */
 header { background:#2c3e50; color:white; padding:20px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.2); position: fixed; width:100%; z-index: 10; }
-header h1 { font-size:1.8em; }
+header h1 { font-size:1.8em; max-width:90%; margin:auto; }
 header button { position:absolute; left:10px; top:15px; background:#2980b9; border:none; padding:10px; border-radius:10px; box-shadow:0 4px #1f5f8b; color:white; cursor:pointer; }
 
 /* Side Menu */
-#sideMenu { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#34495e; color:white; padding:20px; transition:0.3s; z-index:20; }
-#sideMenu a { display:block; padding:15px 10px; color:white; text-decoration:none; border-radius:8px; margin-bottom:10px; background:#2980b9; box-shadow:0 4px #1f5f8b; }
+#sideMenu { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#34495e; color:white; padding:20px; transition:0.3s; z-index:20; overflow-y:auto; }
+#sideMenu a { display:block; padding:15px 10px; color:white; text-decoration:none; border-radius:8px; margin-bottom:10px; background:#2980b9; box-shadow:0 4px #1f5f8b; text-align:center; }
 #sideMenu a:hover { background:#1f5f8b; }
 
 /* Main content */
-main { padding:90px 20px 20px 20px; max-width:900px; margin:auto; transition: transform 0.3s ease; }
+main { padding:110px 20px 20px 20px; max-width:900px; margin:auto; transition: transform 0.3s ease; }
 
 /* Pulsanti moderni 3D */
-button, a.button { display:inline-block; margin:5px; padding:12px 24px; background:#3498db; color:white; text-decoration:none; border:none; border-radius:12px; cursor:pointer; font-weight:bold; box-shadow:0 4px #2980b9; transition:0.1s; }
+button, a.button { display:inline-block; margin:5px; padding:12px 24px; background:#3498db; color:white; text-decoration:none; border:none; border-radius:12px; cursor:pointer; font-weight:bold; box-shadow:0 4px #2980b9; transition:0.1s; text-align:center; }
 button:hover, a.button:hover { background:#2980b9; }
 button:active, a.button:active { transform: translateY(4px); box-shadow:0 0 #2980b9; }
 
 /* Fornitore card */
-.fornitore { background:white; margin:15px 0; padding:15px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); transition:0.2s; }
-.fornitore:hover { transform: translateY(-2px) rotateX(2deg); box-shadow:0 8px 12px rgba(0,0,0,0.15); }
+.fornitore { background:white; margin:15px auto; padding:15px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); transition:0.2s; max-width:100%; }
+.fornitore h3 { margin-bottom:10px; word-break: break-word; }
+.fornitore p { margin-bottom:5px; }
+.fornitore button, .fornitore a.button { width:100%; text-align:center; margin-top:5px; }
 
 /* Input e select */
-input, select { width:100%; padding:12px; margin:5px 0; border-radius:8px; border:1px solid #ccc; }
+input, select { width:100%; padding:12px; margin:5px 0 15px 0; border-radius:8px; border:1px solid #ccc; }
 
 /* Tabelle */
 table { width:100%; border-collapse: collapse; margin-top:15px; }
-th, td { border:1px solid #ccc; padding:10px; text-align:left; }
+th, td { border:1px solid #ccc; padding:10px; text-align:left; word-break: break-word; }
 th { background:#eee; }
 
 /* Filtri */
 .filter { margin: 10px 0; }
 .filter input, .filter select { margin-bottom:10px; }
 
+/* Hidden */
 .hidden { display:none; }
 
-/* Media queries mobile */
+/* Responsive mobile */
 @media (max-width:600px){
+  header h1 { font-size:1.5em; max-width:95%; }
   th, td { font-size:14px; padding:8px; }
-  header h1 { font-size:1.5em; }
+  main { padding:120px 10px 20px 10px; }
+  button, a.button { padding:10px; font-size:14px; }
 }
 </style>
 </head>
@@ -95,7 +100,6 @@ th { background:#eee; }
     <input type="text" id="contatto" placeholder="Numero WhatsApp" required>
     <button type="submit">Salva</button>
   </form>
-  <p id="msg"></p>
   <button onclick="showPage('home')">Torna Home</button>
 </div>
 
@@ -103,7 +107,7 @@ th { background:#eee; }
 <div id="fornitori" class="hidden">
   <h2>Elenco Fornitori</h2>
   <div class="filter">
-    <label>Filtra per categorie (Ctrl o Cmd per selezionare più):</label>
+    <label>Filtra per categorie:</label>
     <select id="filterCategoria" multiple onchange="renderFornitori()">
       <option value="Verdure">Verdure</option>
       <option value="Carne">Carne</option>
@@ -150,9 +154,6 @@ th { background:#eee; }
 <!-- DASHBOARD -->
 <div id="dashboard" class="hidden">
   <h2>Dashboard Fornitori</h2>
-  <button onclick="exportCSV()">Esporta CSV</button>
-  <input type="file" id="importFile" accept=".csv">
-  <button onclick="importCSV()">Importa CSV</button>
   <table>
     <thead>
       <tr>
@@ -161,7 +162,6 @@ th { background:#eee; }
         <th>Località</th>
         <th>Prodotti</th>
         <th>Contatto</th>
-        <th>Azioni</th>
       </tr>
     </thead>
     <tbody id="tableFornitori"></tbody>
