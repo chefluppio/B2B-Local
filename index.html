@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Marketplace Locali-Fornitori</title>
+<style>
+* { box-sizing: border-box; margin:0; padding:0; }
+body { font-family: Arial, sans-serif; background:#f5f5f5; overflow-x:hidden; transition: transform 0.3s ease; }
+
+/* Header */
+header { background:#2c3e50; color:white; padding:20px; text-align:center; box-shadow:0 4px 6px rgba(0,0,0,0.2); position: fixed; width:100%; z-index: 10; }
+header h1 { font-size:1.8em; }
+header button { position:absolute; left:10px; top:15px; background:#2980b9; border:none; padding:10px; border-radius:10px; box-shadow:0 4px #1f5f8b; color:white; cursor:pointer; }
+
+/* Side Menu */
+#sideMenu { position:fixed; left:-250px; top:0; width:250px; height:100%; background:#34495e; color:white; padding:20px; transition:0.3s; z-index:20; }
+#sideMenu a { display:block; padding:15px 10px; color:white; text-decoration:none; border-radius:8px; margin-bottom:10px; background:#2980b9; box-shadow:0 4px #1f5f8b; }
+#sideMenu a:hover { background:#1f5f8b; }
+
+/* Main content */
+main { padding:90px 20px 20px 20px; max-width:900px; margin:auto; transition: transform 0.3s ease; }
+
+/* Pulsanti moderni 3D */
+button, a.button { display:inline-block; margin:5px; padding:12px 24px; background:#3498db; color:white; text-decoration:none; border:none; border-radius:12px; cursor:pointer; font-weight:bold; box-shadow:0 4px #2980b9; transition:0.1s; }
+button:hover, a.button:hover { background:#2980b9; }
+button:active, a.button:active { transform: translateY(4px); box-shadow:0 0 #2980b9; }
+
+/* Fornitore card */
+.fornitore { background:white; margin:15px 0; padding:15px; border-radius:10px; box-shadow:0 4px 8px rgba(0,0,0,0.1); transition:0.2s; }
+.fornitore:hover { transform: translateY(-2px) rotateX(2deg); box-shadow:0 8px 12px rgba(0,0,0,0.15); }
+
+/* Input e select */
+input, select { width:100%; padding:12px; margin:5px 0; border-radius:8px; border:1px solid #ccc; }
+
+/* Tabelle */
+table { width:100%; border-collapse: collapse; margin-top:15px; }
+th, td { border:1px solid #ccc; padding:10px; text-align:left; }
+th { background:#eee; }
+
+/* Filtri */
+.filter { margin: 10px 0; }
+.filter input, .filter select { margin-bottom:10px; }
+
+.hidden { display:none; }
+
+/* Media queries mobile */
+@media (max-width:600px){
+  th, td { font-size:14px; padding:8px; }
+  header h1 { font-size:1.5em; }
+}
+</style>
+</head>
+<body>
+
+<header>
+<button onclick="toggleMenu()">☰</button>
+<h1>Marketplace Locali-Fornitori</h1>
+</header>
+
+<div id="sideMenu">
+  <a href="#" onclick="showPage('home'); toggleMenu()">Home</a>
+  <a href="#" onclick="showPage('fornitori'); toggleMenu()">Cerca Fornitori</a>
+  <a href="#" onclick="showPage('registrazione'); toggleMenu()">Registra Fornitore</a>
+  <a href="#" onclick="showPage('locali'); toggleMenu()">Area Locali</a>
+  <a href="#" onclick="showPage('preferiti'); toggleMenu()">Preferiti Locali</a>
+  <a href="#" onclick="showPage('dashboard'); toggleMenu()">Dashboard</a>
+</div>
+
+<main>
+<!-- HOME -->
+<div id="home">
+  <h2>Sei un:</h2>
+  <button onclick="showPage('fornitori')">Locale (cerco fornitori)</button>
+  <button onclick="showPage('registrazione')">Fornitore (vendi prodotti)</button>
+  <button onclick="showPage('locali')">Area Locali</button>
+  <button onclick="showPage('preferiti')">Preferiti Locali</button>
+  <button onclick="showPage('dashboard')">Dashboard Fornitori</button>
+</div>
+
+<!-- REGISTRAZIONE FORNITORE -->
+<div id="registrazione" class="hidden">
+  <h2>Registrazione / Modifica Fornitore</h2>
+  <form id="formFornitore">
+    <input type="text" id="nome" placeholder="Nome Fornitore" required>
+    <input type="text" id="localita" placeholder="Località" required>
+    <label>Seleziona categorie (Ctrl o Cmd per selezionare più):</label>
+    <select id="categoria" multiple required>
+      <option value="Verdure">Verdure</option>
+      <option value="Carne">Carne</option>
+      <option value="Bevande">Bevande</option>
+      <option value="Altro">Altro</option>
+    </select>
+    <input type="text" id="prodotti" placeholder="Prodotti separati da virgola" required>
+    <input type="text" id="contatto" placeholder="Numero WhatsApp" required>
+    <button type="submit">Salva</button>
+  </form>
+  <p id="msg"></p>
+  <button onclick="showPage('home')">Torna Home</button>
+</div>
+
+<!-- ELENCO FORNITORI -->
+<div id="fornitori" class="hidden">
+  <h2>Elenco Fornitori</h2>
+  <div class="filter">
+    <label>Filtra per categorie (Ctrl o Cmd per selezionare più):</label>
+    <select id="filterCategoria" multiple onchange="renderFornitori()">
+      <option value="Verdure">Verdure</option>
+      <option value="Carne">Carne</option>
+      <option value="Bevande">Bevande</option>
+      <option value="Altro">Altro</option>
+    </select>
+    <label>Filtra per città:</label>
+    <input type="text" id="filterCitta" placeholder="Inserisci città" oninput="renderFornitori()">
+    <label>Ricerca prodotti:</label>
+    <input type="text" id="searchProdotti" placeholder="Parola chiave prodotto" oninput="renderFornitori()">
+  </div>
+  <div id="listaFornitori"></div>
+  <button onclick="showPage('home')">Torna Home</button>
+</div>
+
+<!-- AREA LOCALI -->
+<div id="locali" class="hidden">
+  <h2>Area Locali: Trova Fornitori</h2>
+  <p>Filtra i fornitori e salvali tra i preferiti per contatti futuri.</p>
+  <div class="filter">
+    <label>Categoria prodotti:</label>
+    <select id="localiCategoria" multiple onchange="renderLocali()">
+      <option value="Verdure">Verdure</option>
+      <option value="Carne">Carne</option>
+      <option value="Bevande">Bevande</option>
+      <option value="Altro">Altro</option>
+    </select>
+    <label>Città:</label>
+    <input type="text" id="localiCitta" placeholder="Inserisci città" oninput="renderLocali()">
+    <label>Prodotto specifico:</label>
+    <input type="text" id="localiProdotto" placeholder="Parola chiave prodotto" oninput="renderLocali()">
+  </div>
+  <div id="localiLista"></div>
+  <button onclick="showPage('home')">Torna Home</button>
+</div>
+
+<!-- PREFERITI LOCALI -->
+<div id="preferiti" class="hidden">
+  <h2>Preferiti Locali</h2>
+  <div id="listaPreferiti"></div>
+  <button onclick="showPage('home')">Torna Home</button>
+</div>
+
+<!-- DASHBOARD -->
+<div id="dashboard" class="hidden">
+  <h2>Dashboard Fornitori</h2>
+  <button onclick="exportCSV()">Esporta CSV</button>
+  <input type="file" id="importFile" accept=".csv">
+  <button onclick="importCSV()">Importa CSV</button>
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Categorie</th>
+        <th>Località</th>
+        <th>Prodotti</th>
+        <th>Contatto</th>
+        <th>Azioni</th>
+      </tr>
+    </thead>
+    <tbody id="tableFornitori"></tbody>
+  </table>
+  <button onclick="showPage('home')">Torna Home</button>
+</div>
+
+<script>
+let fornitori = JSON.parse(localStorage.getItem('fornitori')) || [];
+let preferiti = JSON.parse(localStorage.getItem('preferiti')) || [];
+let currentId = null;
+
+function toggleMenu(){
+  let menu = document.getElementById('sideMenu');
+  if(menu.style.left=='0px'){
+    menu.style.left='-250px';
+    document.body.style.transform='translateX(0)';
+  } else {
+    menu.style.left='0';
+    document.body.style.transform='translateX(250px)';
+  }
+}
+
+function toggleMenuClose(){
+  document.getElementById('sideMenu').style.left='-250px';
+  document.body.style.transform='translateX(0)';
+}
+
+function showPage(page){
+  document.querySelectorAll('main > div').forEach(div => div.classList.add('hidden'));
+  document.getElementById(page).classList.remove('hidden');
+  toggleMenuClose();
+  if(page=='fornitori') renderFornitori();
+  if(page=='locali') renderLocali();
+  if(page=='preferiti') renderPreferiti();
+}
+
+document.getElementById('formFornitore').addEventListener('submit', function(e){
+  e.preventDefault();
+  let selectedCats = Array.from(document.getElementById('categoria').selectedOptions).map(o=>o.value);
+  if(currentId){
+    let f = fornitori.find(f => f.id === currentId);
+    f.nome = document.getElementById('nome').value;
+    f.localita = document.getElementById('localita').value;
+    f.categoria = selectedCats;
+    f.prodotti = document.getElementById('prodotti').value;
+    f.contatto = document.getElementById('contatto').value;
+    currentId = null;
+  } else {
+    let f = {
+      id: Date.now(),
+      nome: document.getElementById('nome').value,
+      localita: document.getElementById('localita').value,
+      categoria: selectedCats,
+      prodotti: document.getElementById('prodotti').value,
+      contatto: document.getElementById('contatto').value
+    };
+    fornitori.push(f);
+  }
+  localStorage.setItem('fornitori', JSON.stringify(fornitori));
+  document.getElementById('formFornitore').reset();
+  showPage('fornitori');
+});
+
+function renderFornitori(){
+  let lista = document.getElementById('listaFornitori');
+  let filterCats = Array.from(document.getElementById('filterCategoria').selectedOptions).map(o=>o.value);
+  let filterCity = document.getElementById('filterCitta').value.toLowerCase();
+  let searchProd = document.getElementById('searchProdotti').value.toLowerCase();
+  let filtered = fornitori.filter(f => 
+    (filterCats.length==0 || f.categoria.some(c => filterCats.includes(c))) &&
+    (filterCity=='' || f.localita.toLowerCase().includes(filterCity)) &&
+    (searchProd=='' || f.prodotti.toLowerCase().includes(searchProd))
+  );
+  lista.innerHTML = '';
+  if(filtered.length==0){ lista.innerHTML='<p>Nessun fornitore trovato.</p>'; return; }
+  filtered.forEach(f => {
+    let div = document.createElement('div');
+    div.className = 'fornitore';
+    div.innerHTML = `<h3>${f.nome}</h3>
+                     <p>Categorie: ${f.categoria.join(', ')}</p>
+                     <p>Località: ${f.localita}</p>
+                     <button onclick="aggiungiPreferito(${f.id})">Aggiungi ai Preferiti</button>`;
+    lista.appendChild(div);
+  });
+}
+
+function renderLocali(){
+  let lista = document.getElementById('localiLista');
+  let filterCats = Array.from(document.getElementById('localiCategoria').selectedOptions).map(o=>o.value);
+  let filterCity = document.getElementById('localiCitta').value.toLowerCase();
+  let searchProd = document.getElementById('localiProdotto').value.toLowerCase();
+  let filtered = fornitori.filter(f => 
+    (filterCats.length==0 || f.categoria.some(c => filterCats.includes(c))) &&
+    (filterCity=='' || f.localita.toLowerCase().includes(filterCity)) &&
+    (searchProd=='' || f.prodotti.toLowerCase().includes(searchProd))
+  );
+  lista.innerHTML = '';
+  if(filtered.length==0){ lista.innerHTML='<p>Nessun fornitore trovato.</p>'; return; }
+  filtered.forEach(f => {
+    let div = document.createElement('div');
+    div.className = 'fornitore';
+    div.innerHTML = `<h3>${f.nome}</h3>
+                     <p>Categorie: ${f.categoria.join(', ')}</p>
+                     <p>Località: ${f.localita}</p>
+                     <p>Prodotti: ${f.prodotti}</p>
+                     <a href="https://wa.me/${f.contatto}" target="_blank" class="button">Contatta su WhatsApp</a>
+                     <button onclick="aggiungiPreferito(${f.id})">Aggiungi ai Preferiti</button>`;
+    lista.appendChild(div);
+  });
+}
+
+function aggiungiPreferito(id){
+  let f = fornitori.find(f => f.id === id);
+  if(!preferiti.some(p => p.id===id)) preferiti.push(f);
+  localStorage.setItem('preferiti', JSON.stringify(preferiti));
+  alert('Fornitore aggiunto ai preferiti!');
+}
+
+function renderPreferiti(){
+  let lista = document.getElementById('listaPreferiti');
+  lista.innerHTML = '';
+  if(preferiti.length==0){ lista.innerHTML='<p>Nessun fornitore salvato.</p>'; return; }
+  preferiti.forEach(f=>{
+    let div = document.createElement('div');
+    div.className = 'fornitore';
+    div.innerHTML = `<h3>${f.nome}</h3>
+                     <p>Categorie: ${f.categoria.join(', ')}</p>
+                     <p>Località: ${f.localita}</p>
+                     <p>Prodotti: ${f.prodotti}</p>
+                     <a href="https://wa.me/${f.contatto}" target="_blank" class="button">Contatta su WhatsApp</a>`;
+    lista.appendChild(div);
+  });
+}
+</script>
+</body>
+</html>
